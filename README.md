@@ -7,10 +7,17 @@
   - [Pair programming session](#pair-programming-session)
 - [Booking system for electric cars by subscription](#booking-system-for-electric-cars-by-subscription)
   - [Critical business logic:](#critical-business-logic)
+  - [Entities](#entities)
+    - [User](#user)
+    - [Subscription](#subscription)
+    - [Electric vehicle](#electric-vehicle)
+    - [Invoice](#invoice)
   - [User stories](#user-stories)
     - [Available electric cars list](#available-electric-cars-list)
+    - [Filter available electric cars list](#filter-available-electric-cars-list)
     - [Detail electric car](#detail-electric-car)
-  - [Subscribe to an electric car](#subscribe-to-an-electric-car)
+    - [Subscribe to an electric car](#subscribe-to-an-electric-car)
+    - [New invoice](#new-invoice)
 
 # Docker environment documentation
 
@@ -45,6 +52,8 @@ This reservation system allows users to access an electric car in a subscription
 
 **Note:** Use to your advantage all the tools offered by the framework and the external libraries you need to accomplish the task. Be cautious when deciding if you really need that external library to complete the task.
 
+---
+
 ## Critical business logic:
 
 - The electric car list can be seeing by anyone
@@ -57,18 +66,74 @@ This reservation system allows users to access an electric car in a subscription
 - The user can cancel the subscription at anytime
 - The cancelation begins a collection of the electric car if this one is already delivered
 
+## Entities
+
+We give you the basic models but feel free to add new properties or create new models if needed.
+
+### User
+
+**Relationships:** Subscriptions, Invoices
+The default properties that comes with Laravel are enough
+
+### Subscription
+
+**Relationships:** User, Electric Vehicle
+
+- Status (NEW, ACTIVE, DELIVERY_PROCESSING, COLLECTION_PROCESSING, CANCELLED, ENDED)
+- Starts at
+- Ends at
+- Cancelled at
+- Cancellation reason
+- Monthly price
+- Electric car delivery date
+- Electric car collection date
+
+### Electric vehicle
+
+**Relationships:** Subscription
+
+- Make
+- Model
+- Battery size
+- Registration plate
+- Status (AVAILABLE, UNDER SUBSCRIPTION, NOT AVAILABLE)
+- Price
+- Price variations _(only for 3, 6, 9 , 12 months subscriptions)_
+- Real word range _(in miles)_
+- Max speed _(in miles/hour)_
+
+### Invoice
+
+**Relationships:** User, Subscription
+
+- Type _(Initial Payment, Monthly Payment)_
+- Total
+- Description
+- Payment date
+
 ## User stories
 
 ### Available electric cars list
 
 **As a customer**
 I want to see the list of available electric cars
-So that I can see all the available cars and select each to see detailed info
+So that I can see all the available cars and select each one to see detailed info
 
 **User Acceptance Criteria:**
 GIVEN the electric cars list
 WHEN the user selects him
 THEN I can see the electric car details
+
+### Filter available electric cars list
+
+**As a customer**
+I want to filter _(including sort)_ the list of available electric cars by price, real world range, battery size, max speed
+So that I can see all the available cars and select each one to see detailed info
+
+**User Acceptance Criteria:**
+GIVEN the electric cars list
+WHEN the user apply or remove a filter
+THEN I can see the electric car list filtered by selected filters
 
 ### Detail electric car
 
@@ -81,13 +146,24 @@ GIVEN the electric car unique identifier
 WHEN the user wants to see the electric car detail
 THEN I can see the electric car detail and be able to start a subscription process
 
-## Subscribe to an electric car
+### Subscribe to an electric car
 
 **As a customer**
 I want to see the summary of my subscription
-So that I can do the initial payment
+So that I can do the initial payment to complete subscription
 
 **User Acceptance Criteria:**
 GIVEN the electric car and subscription summary
 WHEN the user wants to pay for subscription
 THEN I can subscribe to the electric car selected
+
+### New invoice
+
+**As a customer**
+I want to see the invoice in PDF format on my email
+So that I can have information about my subscription payments
+
+**User Acceptance Criteria:**
+GIVEN the subscription
+WHEN a new payment was charged to the user
+THEN I can receive an email with the new invoice
