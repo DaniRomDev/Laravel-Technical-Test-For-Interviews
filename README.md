@@ -51,7 +51,7 @@ All the documentation to get up and running with the prepared docker environment
 
 # Before you begin to code
 
-Be aware that **_you don't need to finish all the users stories_**, the main objective is to see how organized you are when creating the code, the git commits, if you apply clean code concepts, test suites for your new code, etc.
+Be aware that **_you don't need to finish all the users stories_**, the main objective is to see how organized you are - **when** creating the code, the git commits, if you apply clean code concepts, test suites for your new code, etc.
 
 We prefer that you finish one or two user stories but fully tested and well organized that all of them but without any test or not having in mind if another developer is going to read your code in the future (or you).
 
@@ -75,7 +75,7 @@ We look forward to hearing from you!
 
 This reservation system allows users to access an electric car in a subscription format with a minimum subscription duration of 1 month and a maximum of 12 months. There is a initial payment _(with extra fees and other stuff)_ and recurring payments each month _(only the electric vehicle price)_.
 
-**Note:** Use to your advantage all the tools offered by the framework and the external libraries you need to accomplish the task. Be cautious when deciding if you really need that external library to complete the task.
+**Note:** Use to your advantage all the tools offered by the framework and the external libraries you need to accomplish the task. Be cautious - **when** deciding if you really need that external library to complete the task.
 
 ---
 
@@ -144,98 +144,134 @@ The default properties that comes with Laravel are enough
 ### Available electric cars list
 
 **As a user**
-I want to see the list of available electric cars
-So that I can see all the available cars and select each one to go to a detail view
+
+- I want to see the list of available electric cars
+- So that I can see all the available cars and select each one to go to a detail view
 
 **User Acceptance Criteria:**
-GIVEN the electric cars list
-WHEN the user select one of them
-THEN I can see the electric car details
+
+- **GIVEN** the electric cars list
+
+- **WHEN** the user select one of them
+
+- **THEN** I can see the electric car details
+
+---
 
 ### Filter available electric cars list
 
 **As a user**
-I want to filter _(including sort)_ the list of available electric cars by price, real world range, battery size, max speed
-So that I can see all the available cars and select each one to go to a detail view
+
+- I want to filter _(including sort)_ the list of available electric cars by price, real world range, battery size, max speed
+- So that I can see all the available cars and select each one to go to a detail view
 
 **User Acceptance Criteria:**
-GIVEN the electric cars list
-WHEN the user apply or remove a filter
-THEN I can see the electric car list filtered by selected filters
+
+- **GIVEN** the electric cars list
+- **WHEN** the user apply or remove a filter
+- **THEN** I can see the electric car list filtered by selected filters
+
+---
 
 ### Detail electric car
 
 **As a user**
-I want to see the electric car detail
-So that I can decide if I want to subscribe to the electric car
+
+- I want to see the electric car detail
+- So that I can decide if I want to subscribe to the electric car
 
 **User Acceptance Criteria:**
-GIVEN the electric car unique identifier
-WHEN the user wants to see the electric car detail
-THEN I can see the electric car detail and be able to start a subscription process
+
+- **GIVEN** the electric car unique identifier
+- **WHEN** the user wants to see the electric car detail
+- **THEN** I can see the electric car detail and be able to start a subscription process
+
+---
 
 ### Subscribe to an electric car
 
 **As an authenticated user**
-I want to subscribe for the selected car
-So that I can do the initial payment to complete subscription
+
+- I want to subscribe for the selected car
+- So that I can do the initial payment to complete subscription
 
 **User Acceptance Criteria:**
-GIVEN the electric car and subscription length
-WHEN the user wants to pay for subscription in electric car detail
-THEN I can subscribe to the electric car selected
+
+- **GIVEN** the electric car and subscription length
+- **WHEN** the user wants to pay for subscription in electric car detail
+- **THEN** I can subscribe to the electric car selected
+
+---
 
 ### Update my subscription length
 
 **As an authenticated user**
-I want to change my subscription length
-So that I can see the subscription monthly price and end date updated
+
+- I want to change my subscription length
+- So that I can see the subscription monthly price and end date updated
 
 **User Acceptance Criteria:**
-GIVEN the user subscription and the new length
-WHEN the user update the subscription
-THEN I can see my subscription monthly price and end date updated
+
+- **GIVEN** the user subscription and the new length
+- **WHEN** the user update the subscription
+- **THEN** I can see my subscription monthly price and end date updated
+
+---
 
 ### See invoice on user email as an attachment
 
 **As a registered user**
-I want to see the invoice in PDF format on my email
-So that I can have information about my subscription payments
+
+- I want to see the invoice in PDF format on my email
+- So that I can have information about my subscription payments
 
 **User Acceptance Criteria:**
-GIVEN the user subscription
-WHEN a new payment was charged to the user
-THEN I can receive an email with the new invoice
+
+- **GIVEN** the user subscription
+- **WHEN** a new payment was charged to the user
+- **THEN** I can receive an email with the new invoice
+
+---
 
 ### See/Download invoices inside the application
 
 **As a registered user**
-I want to see my invoices in the application
-So that I can have information about my subscription invoices and download them
+
+- I want to see my invoices in the application
+- So that I can have information about my subscription invoices and download them
 
 **User Acceptance Criteria:**
-GIVEN the authenticated user
-WHEN I would like to see a list of my invoices
-THEN I can see the list of my invoices and download in PDF format
+
+- **GIVEN** the authenticated user
+- **WHEN** I would like to see a list of my invoices
+- **THEN** I can see the list of my invoices and download in PDF format
+
+---
 
 ### Cancel my subscription without electric car delivered yet
 
 **As a registered user**
-I want to be able to cancel my subscription at anytime
-So that I can stop using the electric car and be able to subscribe to a new vehicle
+
+- I want to be able to cancel my subscription at anytime
+- So that I can stop using the electric car and be able to subscribe to a new vehicle
 
 **User Acceptance Criteria:**
-GIVEN the authenticated user and the subscription
-WHEN I request to cancell my actual subscription
-THEN I can see an email notification with my subscription cancelled and my initial payment refunded
+
+- **GIVEN** the authenticated user and the subscription
+- **WHEN** I request to cancell my actual subscription
+- **THEN** I can see an email notification with my subscription cancelled and my initial payment refunded
+
+---
 
 ### Cancel my subscription with electric car delivered
 
 **As a registered user**
-I want to be able to cancel my subscription at anytime
-So that I can stop using the electric car and be able to subscribe to a new vehicle
+
+- I want to be able to cancel my subscription at anytime
+- So that I can stop using the electric car and be able to subscribe to a new vehicle
 
 **User Acceptance Criteria:**
-GIVEN the authenticated user and the subscription
-WHEN I request to cancel my actual subscription
-THEN I can see an email notification with my subscription cancelled and the information of the collection in process for my electric car that's going to be done 1 week after the cancellation request day.
+
+- **GIVEN** the authenticated user and the subscription
+- **WHEN** I request to cancel my actual subscription
+- **THEN** I can see an email notification with my subscription cancelled and the information of the collection in process for my electric car that's going to be done 1 week after the cancellation request day.
