@@ -1,12 +1,14 @@
 # Table of contents
 
 - [Table of contents](#table-of-contents)
-- [Docker environment documentation](#docker-environment-documentation)
+- [Our review process](#our-review-process)
+- [Docker environment documentation (Optional)](#docker-environment-documentation-optional)
+    - [Initial setup for Linux/MacOS _(go to the documentation if you are using Windows)_](#initial-setup-for-linuxmacos-go-to-the-documentation-if-you-are-using-windows)
 - [Before you begin to code](#before-you-begin-to-code)
   - [Detail explanation](#detail-explanation)
   - [Pair programming session](#pair-programming-session)
 - [Booking system for electric cars by subscription](#booking-system-for-electric-cars-by-subscription)
-  - [Critical business logic:](#critical-business-logic)
+  - [Critical business logic to have in mind:](#critical-business-logic-to-have-in-mind)
   - [Entities](#entities)
     - [User](#user)
     - [Subscription](#subscription)
@@ -17,22 +19,45 @@
     - [Filter available electric cars list](#filter-available-electric-cars-list)
     - [Detail electric car](#detail-electric-car)
     - [Subscribe to an electric car](#subscribe-to-an-electric-car)
-    - [New invoice](#new-invoice)
+    - [Update my subscription length](#update-my-subscription-length)
+    - [See invoice on user email as an attachment](#see-invoice-on-user-email-as-an-attachment)
+    - [See/Download invoices inside the application](#seedownload-invoices-inside-the-application)
+    - [Cancel my subscription without electric car delivered yet](#cancel-my-subscription-without-electric-car-delivered-yet)
+    - [Cancel my subscription with electric car delivered](#cancel-my-subscription-with-electric-car-delivered)
 
-# Docker environment documentation
+# Our review process
+
+The technical test is the same for all levels but depending on the job position, the requirements will be different. **None of the positions have to complete all the user stories**
+
+**As a Junior position:** if you know the basic fundamentals of Laravel/PHP and can complete at least 2 user stories with minimal quality is enough _(Unit tests are optional but highly recommended)_
+
+**As a Mid developer position:** if you use some design patterns, have SOLID principles in mind, use the framework to your advantage, have a solid database knowledge with the extra of having a good test suite is enough.
+
+**As a Senior:** Here we will be a bit more demanding and we assume that you know the framework very well and have worked some years with PHP. You think about scalability and maintainability of the code even if the tasks are simple because you know that the application will grow sooner or later. You don't lack tests and you document the necessary parts so that other developers have the right information _(the deploy of the application would be awesome but it's totally optional)_
+
+# Docker environment documentation (Optional)
+
+**Important note:** This is an optional step and you can use the development environment for Laravel projects that you feel more comfortable working with in your host machine. We simply provide a good environment compatible with several operating systems in which you will only need to have Docker installed on your main computer.
+
+While you can work on the **src** folder with a laravel project and upload the code to the repository, is enough for us.
+
+### Initial setup for Linux/MacOS _(go to the documentation if you are using Windows)_
+
+```sh
+ cp .env.example .env && make && make install-laravel && make restart
+```
 
 All the documentation to get up and running with the prepared docker environment is on [Docker starter PHP](https://github.com/DaniRomDev/Docker-Starter-PHP/blob/main/README.md)
-
-**Important note:** This is an optional step and you can use the development environment for Laravel projects that you feel more comfortable working with. We simply provide a good environment compatible with several operating systems in which you will only need to have Docker installed on your main machine and run a simple `make` command in the root of the project.
 
 # Before you begin to code
 
 Be aware that **_you don't need to finish all the users stories_**, the main objective is to see how organized you are when creating the code, the git commits, if you apply clean code concepts, test suites for your new code, etc.
 
-We prefer that you finish one user story but fully tested and well organized that all of them but without any test or not having in mind if another developer is going to read your code in the future (or you).
+We prefer that you finish one or two user stories but fully tested and well organized that all of them but without any test or not having in mind if another developer is going to read your code in the future (or you).
 
 ## Detail explanation
 
+- There is no single path to complete a user story, whether you want to create the application as a REST api or a combination of web and REST api is up to you, only be consistent in what you do.
 - Work on the project. You can take as long as you feel you need, however, we urge you not to spend more than a few hours. **_Remember: we are evaluating how well you would fit on a team of developers, not working in isolation._**
 - Once you have finished your work please **tag your development branch as** **_1.0_** and reply to the email that invited you to do the project to let us know it is complete.
 
@@ -48,27 +73,30 @@ We look forward to hearing from you!
 
 # Booking system for electric cars by subscription
 
-This reservation system allows users to access an electric car in a subscription format _(like Netflix)_, with a minimum subscription duration of one month and a maximum of 12 months. There is a initial payment _(with extra fees and other stuff)_ and recurring payments each month _(only the electric vehicle price)_.
+This reservation system allows users to access an electric car in a subscription format with a minimum subscription duration of 1 month and a maximum of 12 months. There is a initial payment _(with extra fees and other stuff)_ and recurring payments each month _(only the electric vehicle price)_.
 
 **Note:** Use to your advantage all the tools offered by the framework and the external libraries you need to accomplish the task. Be cautious when deciding if you really need that external library to complete the task.
 
 ---
 
-## Critical business logic:
+## Critical business logic to have in mind:
 
 - The electric car list can be seeing by anyone
-- The user needs to be authenticated to be able subscribe a car
+- The user needs to be authenticated to be able subscribe an electric car
 - The users can only have one active subscription.
-- The monthly price is differente based on the subscription duration _e.g: 3 months - 500 €, 6 months - 435€_
-- The electric vehicle under subscription should not be available for other users to subscribe to.
+- The monthly price is different based on the subscription duration _e.g: 3 months - 500 €, 6 months - 435€_
+- The electric vehicle under subscription must not be available for other users to subscribe to.
 - A new invoice should be created for each payment and send to the user via email in PDF format.
 - A subscription is not active until the electric car is delivered to the customer
+- The user can update the subscription length at anytime
 - The user can cancel the subscription at anytime
 - The cancelation begins a collection of the electric car if this one is already delivered
 
 ## Entities
 
-We give you the basic models but feel free to add new properties or create new models if needed.
+We give you the basic models but feel free to add new properties or create new models if needed. The creation of the models, migrations, database fields, files that you think you need is up to you as long as you can explain it in the pair programming session.
+
+Create the necessary entities of the user stories you are going to complete, if for example you are not going to complete anyone related to invoices, do not create the invoice model.
 
 ### User
 
@@ -77,9 +105,9 @@ The default properties that comes with Laravel are enough
 
 ### Subscription
 
-**Relationships:** User, Electric Vehicle
+**Relationships:** User, Electric Vehicle, Invoices
 
-- Status (NEW, ACTIVE, DELIVERY_PROCESSING, COLLECTION_PROCESSING, CANCELLED, ENDED)
+- Status _(NEW, ACTIVE, DELIVERY_PROCESSING, COLLECTION_PROCESSING, CANCELLED, ENDED)_
 - Starts at
 - Ends at
 - Cancelled at
@@ -96,7 +124,7 @@ The default properties that comes with Laravel are enough
 - Model
 - Battery size
 - Registration plate
-- Status (AVAILABLE, UNDER SUBSCRIPTION, NOT AVAILABLE)
+- Status (AVAILABLE, ON_DELIVERY, UNDER SUBSCRIPTION, ON_COLLECTION, NOT AVAILABLE)
 - Price
 - Price variations _(only for 3, 6, 9 , 12 months subscriptions)_
 - Real word range _(in miles)_
@@ -115,20 +143,20 @@ The default properties that comes with Laravel are enough
 
 ### Available electric cars list
 
-**As a customer**
+**As a user**
 I want to see the list of available electric cars
-So that I can see all the available cars and select each one to see detailed info
+So that I can see all the available cars and select each one to go to a detail view
 
 **User Acceptance Criteria:**
 GIVEN the electric cars list
-WHEN the user selects him
+WHEN the user select one of them
 THEN I can see the electric car details
 
 ### Filter available electric cars list
 
-**As a customer**
+**As a user**
 I want to filter _(including sort)_ the list of available electric cars by price, real world range, battery size, max speed
-So that I can see all the available cars and select each one to see detailed info
+So that I can see all the available cars and select each one to go to a detail view
 
 **User Acceptance Criteria:**
 GIVEN the electric cars list
@@ -137,9 +165,9 @@ THEN I can see the electric car list filtered by selected filters
 
 ### Detail electric car
 
-**As a customer**
+**As a user**
 I want to see the electric car detail
-So that I can decide if want to subscribe to the electric car
+So that I can decide if I want to subscribe to the electric car
 
 **User Acceptance Criteria:**
 GIVEN the electric car unique identifier
@@ -148,22 +176,66 @@ THEN I can see the electric car detail and be able to start a subscription proce
 
 ### Subscribe to an electric car
 
-**As a customer**
-I want to see the summary of my subscription
+**As an authenticated user**
+I want to subscribe for the selected car
 So that I can do the initial payment to complete subscription
 
 **User Acceptance Criteria:**
-GIVEN the electric car and subscription summary
-WHEN the user wants to pay for subscription
+GIVEN the electric car and subscription length
+WHEN the user wants to pay for subscription in electric car detail
 THEN I can subscribe to the electric car selected
 
-### New invoice
+### Update my subscription length
 
-**As a customer**
+**As an authenticated user**
+I want to change my subscription length
+So that I can see the subscription monthly price and end date updated
+
+**User Acceptance Criteria:**
+GIVEN the user subscription and the new length
+WHEN the user update the subscription
+THEN I can see my subscription monthly price and end date updated
+
+### See invoice on user email as an attachment
+
+**As a registered user**
 I want to see the invoice in PDF format on my email
 So that I can have information about my subscription payments
 
 **User Acceptance Criteria:**
-GIVEN the subscription
+GIVEN the user subscription
 WHEN a new payment was charged to the user
 THEN I can receive an email with the new invoice
+
+### See/Download invoices inside the application
+
+**As a registered user**
+I want to see my invoices in the application
+So that I can have information about my subscription invoices and download them
+
+**User Acceptance Criteria:**
+GIVEN the authenticated user
+WHEN I would like to see a list of my invoices
+THEN I can see the list of my invoices and download in PDF format
+
+### Cancel my subscription without electric car delivered yet
+
+**As a registered user**
+I want to be able to cancel my subscription at anytime
+So that I can stop using the electric car and be able to subscribe to a new vehicle
+
+**User Acceptance Criteria:**
+GIVEN the authenticated user and the subscription
+WHEN I request to cancell my actual subscription
+THEN I can see an email notification with my subscription cancelled and my initial payment refunded
+
+### Cancel my subscription with electric car delivered
+
+**As a registered user**
+I want to be able to cancel my subscription at anytime
+So that I can stop using the electric car and be able to subscribe to a new vehicle
+
+**User Acceptance Criteria:**
+GIVEN the authenticated user and the subscription
+WHEN I request to cancel my actual subscription
+THEN I can see an email notification with my subscription cancelled and the information of the collection in process for my electric car that's going to be done 1 week after the cancellation request day.
