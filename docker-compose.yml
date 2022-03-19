@@ -1,0 +1,158 @@
+version: "3.9"
+
+networks:
+  laravel-network:
+    driver: bridge
+
+x-services-volume: &services-volume
+  type: bind
+  source: ./src
+  target: /var/www/html
+
+services:
+  nginx:
+    build:
+      context: ./docker/nginx
+      dockerfile: nginx.dockerfile
+      args:
+        - HOST_UID=${HOST_UID:-1001}
+        - HOST_GID=${HOST_GID:-1001}
+        - APP_USER=${APP_USER}
+    environment:
+      - APP_USER=${APP_USER}
+    container_name: "${CONTAINER_PREFIX}-nginx"
+    restart: unless-stopped
+    ports:
+      - "8080:${NGINX_INTERNAL_PORT}"
+      - 443:443
+    volumes:
+      - <<: *services-volume
+      - ./docker/nginx/certs:/etc/nginx/ssl
+    depends_on:
+      - php
+    networks:
+      - laravel-network
+
+  php:
+    image: laravel-php-app
+    build:
+      context: ./docker/php
+      dockerfile: php8.dockerfile
+      args:
+        - HOST_UID=${HOST_UID:-1001}
+        - HOST_GID=${HOST_GID:-1001}
+        - APP_USER=${APP_USER}
+    container_name: "${CONTAINER_PREFIX}-php"
+    working_dir: /var/www/html
+    user: ${APP_USER}
+    volumes:
+      - <<: *services-volume
+      - ./docker/php/config/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    command: ["php-fpm", "-y", "/usr/local/etc/php-fpm.conf", "-R"]
+    networks:
+      - laravel-network
+
+  scheduler:
+    image: laravel-php-app
+    container_name: "${CONTAINER_PREFIX}-scheduler-php"
+    depends_on:
+      - php
+    volumes:
+      - <<: *services-volume
+    command: ["/usr/local/bin/start"]
+    networks:
+      - laravel-network
+
+  queue:
+    image: laravel-php-app
+    container_name: "${CONTAINER_PREFIX}-queue-php"
+    depends_on:
+      - php
+      - redis
+    links:
+      - redis
+    volumes:
+      - <<: *services-volume
+    command: ["php", "artisan", "horizon"]
+    user: ${APP_USER}
+    networks:
+      - laravel-network
+
+  db:
+    image: "mariadb:10.7.1" # "mysql:5.7.37" for NOT ARM64 ARCHITECTURES (MAC)
+    container_name: "${CONTAINER_PREFIX}-db"
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "3306:${DB_PORT}"
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./docker/database/scripts:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_DATABASE: "${DB_NAME}"
+      MYSQL_USER: "${DB_USER}"
+      MYSQL_PASSWORD: "${DB_USER_PASSWORD}"
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "${DB_ALLOW_EMPTY_PASSWORD}"
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    # command: ["mysqld", "--default-authentication-plugin=mysql_native_password"]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-p${DB_USER_PASSWORD}"]
+      retries: 3
+      timeout: 10s
+    networks:
+      - laravel-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.1.3
+    container_name: ${CONTAINER_PREFIX}-phpmyadmin
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8082:${NGINX_INTERNAL_PORT}"
+    environment:
+      - PMA_HOST=db
+      - PMA_ARBITRARY=1
+      - PMA_PORT=${DB_PORT}
+      - HIDE_PHP_VERSION=true
+    links:
+      - db
+    networks:
+      - laravel-network
+
+  redis:
+    image: "redis:6.2.1-buster"
+    container_name: "${CONTAINER_PREFIX}-redis"
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    networks:
+      - laravel-network
+
+  mailhog:
+    image: "mailhog/mailhog:v1.0.1"
+    container_name: "${CONTAINER_PREFIX}-mailhog"
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - laravel-network
+  ngrok:
+    image: wernight/ngrok:latest
+    container_name: ngrok
+    ports:
+      - 4040:4040
+    environment:
+      NGROK_PROTOCOL: http
+      NGROK_PORT: "nginx:${NGINX_INTERNAL_PORT}"
+      NGROK_AUTH: ${NGROK_TOKEN}
+      NGROK_REGION: eu
+    depends_on:
+      - nginx
+    networks:
+      - laravel-network
+volumes:
+  db-data:
+  redis-data:
