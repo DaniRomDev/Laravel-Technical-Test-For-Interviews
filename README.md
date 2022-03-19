@@ -1,256 +1,93 @@
-<div align="center">
-  <h1 style="margin: 0;">Docker-Starter-Laravel</h1>
-  <img width="100" height="100" src="https://logopng.com.br/logos/docker-27.png" alt="docker" />
-  <img width="100" height="100" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Laravel.svg/1200px-Laravel.svg.png" alt="laravel" />
-  <p>A minimalistic docker environment for Laravel projects without over-engineering and easily customizable.</p>
-</div>
-
 # Table of contents
 
 - [Table of contents](#table-of-contents)
-- [Features](#features)
-- [Prerequisites](#prerequisites)
-  - [Make tool](#make-tool)
-    - [Windows](#windows)
-        - [WSL 2](#wsl-2)
-    - [Unix based systems](#unix-based-systems)
-- [Makefile](#makefile)
-  - [Makefile variables](#makefile-variables)
-  - [Environment root file _(.env)_](#environment-root-file-env)
-  - [Build and get running the local dev environment](#build-and-get-running-the-local-dev-environment)
-    - [Create fresh laravel project](#create-fresh-laravel-project)
-    - [Post Laravel installation](#post-laravel-installation)
-    - [Working with containers](#working-with-containers)
-  - [Use HTTPS and Custom domain on your local environment](#use-https-and-custom-domain-on-your-local-environment)
-    - [Disable HTTPS support on local environment](#disable-https-support-on-local-environment)
+- [Docker environment documentation](#docker-environment-documentation)
+- [Before you begin to code](#before-you-begin-to-code)
+  - [Detail explanation](#detail-explanation)
+  - [Pair programming session](#pair-programming-session)
+- [Booking system for electric cars by subscription](#booking-system-for-electric-cars-by-subscription)
+  - [Critical business logic:](#critical-business-logic)
+  - [User stories](#user-stories)
+    - [Available electric cars list](#available-electric-cars-list)
+    - [Detail electric car](#detail-electric-car)
+  - [Subscribe to an electric car](#subscribe-to-an-electric-car)
 
-# Features
+# Docker environment documentation
 
-- #### Create your laravel environment in no time, **focus on your idea.**
-- #### Share your site with [ngrok](https://ngrok.com/)
-- #### Easily customizable via **.env** files
-- #### Minimal stack to avoid opinionated setups
-- #### Nginx configuration have SSL implemented, automatically created on initial build
-- #### You can add more services in docker-compose.yml without problem
-- #### No more permissions conflict while creating files inside containers
+All the documentation to get up and running with the prepared docker environment is on [Docker starter PHP](https://github.com/DaniRomDev/Docker-Starter-PHP/blob/main/README.md)
 
-# Prerequisites
+**Important note:** This is an optional step and you can use the development environment for Laravel projects that you feel more comfortable working with. We simply provide a good environment compatible with several operating systems in which you will only need to have Docker installed on your main machine and run a simple `make` command in the root of the project.
 
----
+# Before you begin to code
 
-## Make tool
+Be aware that **_you don't need to finish all the users stories_**, the main objective is to see how organized you are when creating the code, the git commits, if you apply clean code concepts, test suites for your new code, etc.
 
-### Windows
+We prefer that you finish one user story but fully tested and well organized that all of them but without any test or not having in mind if another developer is going to read your code in the future (or you).
 
-- Install [Chocolatey package manager](https://chocolatey.org/install)
-- Once installed run: `sh choco install make`
+## Detail explanation
 
-##### WSL 2
+- Work on the project. You can take as long as you feel you need, however, we urge you not to spend more than a few hours. **_Remember: we are evaluating how well you would fit on a team of developers, not working in isolation._**
+- Once you have finished your work please **tag your development branch as** **_1.0_** and reply to the email that invited you to do the project to let us know it is complete.
 
-We strongly recommend using Ubuntu as a subsystem when it comes to work as programmer on windows environments, it will save you a lot of trouble in the future. Here we give you the best resources to prepare the setup on your Windows system.
-[How to setup the perfect development environment for windows](https://char.gd/blog/2017/how-to-set-up-the-perfect-modern-dev-environment-on-windows)
-[Window 10 for web dev](https://fireship.io/lessons/windows-10-for-web-dev)
-[Window terminal preview](https://www.microsoft.com/en-us/p/windows-terminal-preview/9n0dx20hk701?activetab=pivot:overviewtab#)
+## Pair programming session
 
----
+Please use this as an opportunity to show us how good you are at coding and not how quick, we are interested in quality, not quantity, in the context of a team of developers.
 
-### Unix based systems
+Once you've finished **_we will organise a pair programming session_** where you can explain your code and add some features.
 
-Usually is installed by default but if for whatever reason you don't have it, just install the build-essential package via terminal.
+If you have any questions during the project please ask via **Slack**. We will add you to our **Slack** channel shortly and you will receive an invitation. Please use it to to ask any questions and to communicate your progress during the project.
 
-```sh
-# DEBIAN based
-sudo apt install build-essential
+We look forward to hearing from you!
 
-# CentOS and others that use yum
-yum install make
-```
+# Booking system for electric cars by subscription
 
-# Makefile
+This reservation system allows users to access an electric car in a subscription format _(like Netflix)_, with a minimum subscription duration of one month and a maximum of 12 months. There is a initial payment _(with extra fees and other stuff)_ and recurring payments each month _(only the electric vehicle price)_.
 
-This file help us to abstract the layer that interacts with your application in a standard way without needed to touch docker directly.
+**Note:** Use to your advantage all the tools offered by the framework and the external libraries you need to accomplish the task. Be cautious when deciding if you really need that external library to complete the task.
 
-The default make command install automatically the dependencies needed to raise the local development environment and modify your **/etc/hosts** to setup your custom domain that you're plan to use for HTTPS, because of this you need to provide your user password in order to execute commands as **'sudo'** _(don't hesitate to check the bash scripts to make sure there is no malicious code)_.
+## Critical business logic:
 
-**_Note: If you're using WSL you need to manually edit the /etc/hosts on your Window OS to setup the custom domain_**.
+- The electric car list can be seeing by anyone
+- The user needs to be authenticated to be able subscribe a car
+- The users can only have one active subscription.
+- The monthly price is differente based on the subscription duration _e.g: 3 months - 500 €, 6 months - 435€_
+- The electric vehicle under subscription should not be available for other users to subscribe to.
+- A new invoice should be created for each payment and send to the user via email in PDF format.
+- A subscription is not active until the electric car is delivered to the customer
+- The user can cancel the subscription at anytime
+- The cancelation begins a collection of the electric car if this one is already delivered
 
-## Makefile variables
+## User stories
 
-```sh
-#CURRENT DIR FOR WINDOWS & UNIX SYSTEMS
-CURRENT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-SHELL=/bin/bash
-VERSION=${shell cat VERSION}
-DOMAIN :=laravel.local
-PROJECT_FOLDER :=${CURRENT_DIR}src
-DOCKER_PATH :=${CURRENT_DIR}docker
-NGINX_CERTS_PATH :=${DOCKER_PATH}/nginx/certs
+### Available electric cars list
 
-```
+**As a customer**
+I want to see the list of available electric cars
+So that I can see all the available cars and select each to see detailed info
 
-## Environment root file _(.env)_
+**User Acceptance Criteria:**
+GIVEN the electric cars list
+WHEN the user selects him
+THEN I can see the electric car details
 
-Default configuration variables to be used on ` docker-compose.yml`, feel free to modify them to fit your requisites.
+### Detail electric car
 
-```sh
-APP_USER=laravel
+**As a customer**
+I want to see the electric car detail
+So that I can decide if want to subscribe to the electric car
 
-CONTAINER_PREFIX=laravel-app
-NGINX_INTERNAL_PORT=80
+**User Acceptance Criteria:**
+GIVEN the electric car unique identifier
+WHEN the user wants to see the electric car detail
+THEN I can see the electric car detail and be able to start a subscription process
 
-DB_PORT=3306
-DB_NAME=laravel_db
-DB_USER=laravel
-DB_USER_PASSWORD=secret
-DB_ROOT_PASSWORD=secret
-DB_ALLOW_EMPTY_PASSWORD=yes
+## Subscribe to an electric car
 
-NGROK_PROTOCOL=http
-NGROK_TOKEN=# When you create a ngrok account you only need to provide your token here
-NGROK_REGION=eu
-```
+**As a customer**
+I want to see the summary of my subscription
+So that I can do the initial payment
 
-## Build and get running the local dev environment
-
-```sh
-make or make build
-```
-
-### Create fresh laravel project
-
-```sh
-# Be sure to build the docker environment first
-make install-laravel
-```
-
-### Post Laravel installation
-
-Once installed you need to fill **.env** values inside src laravel folder to point to the containers and start using the database, mail interceptor, redis, etc.
-
-```sh
-APP_NAME=Laravel
-APP_ENV=local
-APP_KEY=base64:UmTYomiL4uePMyVQYo0NWxAKMfDJtdenq4I380KE9y0=
-APP_DEBUG=true
-APP_URL=https://laravel.local # Your custom domain selected here or https://localhost:8080
-
-LOG_CHANNEL=stack
-LOG_DEPRECATIONS_CHANNEL=null
-LOG_LEVEL=debug
-
-DB_CONNECTION=db # The docker container for database
-DB_HOST=mysql
-DB_PORT=3306
-# This values are defined on the root .env file
-DB_NAME=laravel_db
-DB_USER=laravel
-DB_USER_PASSWORD=secret
-DB_ROOT_PASSWORD=secret
-DB_ALLOW_EMPTY_PASSWORD=yes
-
-BROADCAST_DRIVER=log
-CACHE_DRIVER=file
-FILESYSTEM_DRIVER=local
-QUEUE_CONNECTION=sync
-SESSION_DRIVER=file
-SESSION_LIFETIME=120
-
-MEMCACHED_HOST=127.0.0.1
-
-REDIS_HOST=redis
-REDIS_PASSWORD=null
-REDIS_PORT=6379
-
-MAIL_MAILER=smtp
-MAIL_HOST=mailhog # Docker container to intercept emails
-MAIL_PORT=1025
-#Feel free to fill this ones with the values that makes sense for your app
-MAIL_USERNAME=laravel
-MAIL_PASSWORD=null
-MAIL_ENCRYPTION=TLS
-MAIL_FROM_ADDRESS=laravel@docker-starter.com
-MAIL_FROM_NAME="${APP_NAME}"
-
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_DEFAULT_REGION=us-east-1
-AWS_BUCKET=
-AWS_USE_PATH_STYLE_ENDPOINT=false
-
-PUSHER_APP_ID=
-PUSHER_APP_KEY=
-PUSHER_APP_SECRET=
-PUSHER_APP_CLUSTER=mt1
-
-MIX_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
-MIX_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
-
-```
-
-### Working with containers
-
-**_For full documentation open the Makefile and see all the commands available_**
-
-```sh
-# For local environment setup
-
-make up # Start the containers
-make down # To turn down completely
-make restart # To restart all the containers
-
-make destroy # To destroy them if you need a complete rebuild
-
-make shell/php # Bash session inside php container (to use artisan commands, composer, npm, etc.)
-```
-
-## Use HTTPS and Custom domain on your local environment
-
-_(Source on detail: https://hackerrdave.com/https-local-docker-nginx/)_
-
-This process is automatically made on the build but if you want to manually run it just do:
-
-```sh
-make certs
-```
-
-### Disable HTTPS support on local environment
-
-If for any reason you don't want to use the https port on your nginx server, just comment out the server block for 443 port
-on file before build the containers
-
-```sh:docker/nginx/default.conf
-# COMMENT THIS PART
-server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
-
-    ssl_certificate /etc/nginx/ssl/ssl.crt;
-    ssl_certificate_key /etc/nginx/ssl/ssl.key;
-    ssl_protocols TLSv1.2;
-
-    server_name localhost *.ngrok.io;
-    index index.php index.html index.htm;
-    error_log  /var/log/nginx/error.log;
-    access_log /var/log/nginx/access.log;
-    root /var/www/html/public;
-
-    location ~ \.php$ {
-        try_files $uri =404;
-        fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        fastcgi_pass php:9000;
-        fastcgi_index index.php;
-        include fastcgi_params;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        fastcgi_param PATH_INFO $fastcgi_path_info;
-    }
-    location / {
-        proxy_set_header Host $http_host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-
-        try_files $uri $uri/ /index.php?$query_string;
-        gzip_static on;
-    }
-}
-```
+**User Acceptance Criteria:**
+GIVEN the electric car and subscription summary
+WHEN the user wants to pay for subscription
+THEN I can subscribe to the electric car selected
